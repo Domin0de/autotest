@@ -58,43 +58,40 @@ def main():
     for test_case in test_cases:
         expected = test_case["expected"]
 
-        p = subprocess.Popen(
+        with subprocess.Popen(
             ["python3", "run.py"],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
-        )
+        ) as p:
 
-        formatted_input = "\n".join(input_data)
-        for input_data in test_case["input"]:
-            p.stdin.write(input_data.encode())
-            p.stdin.flush()
+            formatted_input = "\n".join(input_data)
+            for input_data in test_case["input"]:
+                p.stdin.write(input_data.encode())
+                p.stdin.flush()
 
-        stdout, _ = p.communicate()
-        output = stdout.strip()
+            stdout, _ = p.communicate()
+            output = stdout.strip()
 
-        output_lines = output.split("\n")
+            output_lines = output.split("\n")
 
-        i = 0
+            i = 0
 
-        for test_line in output_lines:
-            expected_line = expected[i]
+            for test_line in output_lines:
+                expected_line = expected[i]
 
-            if test_line == expected_line:
-                i += 1
-                continue
+                if test_line == expected_line:
+                    i += 1
+                    continue
 
-            print(print_format(test_case["name"], formatted_input, output_lines[i:], expected[i:]))
-            break
+                print(print_format(test_case["name"], formatted_input, output_lines[i:], expected[i:]))
+                break
 
-        if i != len(expected):
-            print(print_format(test_case["name"], formatted_input, output, expected))
-        else:
-            print(print_format(test_case["name"], formatted_input))
-
-        p.kill()
-        p.stdin.close()
+            if i != len(expected):
+                print(print_format(test_case["name"], formatted_input, output, expected))
+            else:
+                print(print_format(test_case["name"], formatted_input))
 
 if __name__ == "__main__":
     main()

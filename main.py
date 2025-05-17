@@ -6,9 +6,14 @@ from colorama import Fore, init
 
 LENGTH = 80
 
-def line_format(text, prefix=""):
+def clean_output(output: list):
+    """Clean output list by removing empty string."""
+    if output == [""]:
+        return []
+    return output
+
+def line_format(words: list, prefix=""):
     """Format the text to fit within a specified length."""
-    words = text.split()
     output = ""
 
     new_line = ""
@@ -27,35 +32,43 @@ def line_format(text, prefix=""):
 def print_format(name, input_val, output=None, expected=None):
     """Format the output for display."""
     if output is None:
-        p_name = Fore.GREEN + f"Test passed: {name}"
+        p_name = Fore.GREEN + f"Test passed: {name}\n"
 
-        return f"""
-        {'=' * LENGTH}
-        {p_name}
-        {"=" * LENGTH}
-        """
+        print(
+            p_name + \
+            Fore.RESET + \
+            '=' * LENGTH
+        )
+        return
 
-    p_name = Fore.RED + f"Test failed: {name}"
-    input_val = f"Input:\n{Fore.LIGHTYELLOW_EX}{input_val}\n"
-    output = f"Got:\n{Fore.LIGHTCYAN_EX}{line_format(output)}\n"
-    expected = f"Expected:\n{Fore.LIGHTMAGENTA_EX}{line_format(expected)}\n"
+    p_name = Fore.RED + f"Test failed: {name}\n\n"
+    input_val = f"Input:\n{Fore.LIGHTYELLOW_EX}{input_val if input_val else '<No value>'}\n"
+    output = f"Got:\n{Fore.LIGHTRED_EX}{line_format(output) if output and len(clean_output(output)) != 0 else '<No value>'}\n"
+    expected = f"Expected:\n{Fore.LIGHTGREEN_EX}{line_format(expected) if expected and len(expected) != 0 else '<No value>'}\n"
 
-    return f"""
-        {'=' * LENGTH}
-        {p_name}
-        {input_val}
-        {'-' * LENGTH}
-        {output}
-        {expected}
-        {'=' * LENGTH}
-    """
+    print(
+        p_name + \
+        Fore.RESET + \
+        input_val + \
+        Fore.RESET + \
+        '-' * LENGTH + "\n" + \
+        output + \
+        Fore.RESET + "\n" + \
+        expected + \
+        Fore.RESET + \
+        '=' * LENGTH
+    )
 
 def main():
     """Main function to run the test cases."""
     init()
 
-    test_cases = json.loads("expects.json")
-    config = json.loads("config.json")
+    with open("expects.json", "r", encoding="utf-8") as t:
+        test_cases = json.load(t)
+    with open("config.json", "r", encoding="utf-8") as c:
+        config = json.load(c)
+
+    print('=' * LENGTH)
 
     for test_case in test_cases:
         expected = test_case["expected"]
@@ -67,33 +80,41 @@ def main():
             stderr=subprocess.STDOUT,
             text=True,
         ) as p:
+            printed = False
 
-            formatted_input = "\n".join(input_data)
+            formatted_input = "\n".join(test_case["input"])
             for input_data in test_case["input"]:
                 p.stdin.write(input_data.encode())
                 p.stdin.flush()
 
             stdout, _ = p.communicate()
-            output = stdout.strip()
-
-            output_lines = output.split("\n")
+            output_lines = stdout.strip().split("\n")
 
             i = 0
 
             for test_line in output_lines:
-                expected_line = expected[i]
+                expected_line = expected[i] if i < len(expected) else None
 
                 if test_line == expected_line:
                     i += 1
                     continue
 
-                print(print_format(test_case["name"], formatted_input, output_lines[i:], expected[i:]))
+                print_format(
+                    test_case["name"],
+                    formatted_input,
+                    output_lines[i:],
+                    expected[i:] if i < len(expected) else None
+                )
+                printed = True
                 break
 
+            if printed:
+                continue
+
             if i != len(expected):
-                print(print_format(test_case["name"], formatted_input, output, expected))
+                print_format(test_case["name"], formatted_input, output_lines, expected)
             else:
-                print(print_format(test_case["name"], formatted_input))
+                print_format(test_case["name"], formatted_input)
 
 if __name__ == "__main__":
     main()

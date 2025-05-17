@@ -1,3 +1,4 @@
+# DO NOT MODIFY THIS FILE
 import json
 import subprocess
 
@@ -54,12 +55,13 @@ def main():
     init()
 
     test_cases = json.loads("expects.json")
+    config = json.loads("config.json")
 
     for test_case in test_cases:
         expected = test_case["expected"]
 
         with subprocess.Popen(
-            ["python3", "run.py"],
+            config['run_args'],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,

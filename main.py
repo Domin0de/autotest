@@ -87,16 +87,16 @@ def main():
                 p.stdin.write(input_data)
                 p.stdin.flush()
 
-            p.stdin.close()
-
-            output_lines = p.stdout.read().split("\n")
+            output, _ = p.communicate()
+            output_lines = output.split("\n")
 
             i = 0
 
             for test_line in output_lines:
+                test_line = test_line if test_line else None
                 expected_line = expected[i] if i < len(expected) else None
 
-                if test_line == expected_line:
+                if str(test_line) == str(expected_line):
                     i += 1
                     continue
 
@@ -112,7 +112,7 @@ def main():
             if printed:
                 continue
 
-            if i != len(expected):
+            if i < len(expected):
                 print_format(test_case["name"], formatted_input, output_lines, expected)
             else:
                 print_format(test_case["name"], formatted_input)

@@ -84,11 +84,12 @@ def main():
 
             formatted_input = "\n".join(test_case["input"])
             for input_data in test_case["input"]:
-                p.stdin.write(input_data.encode())
+                p.stdin.write(input_data)
                 p.stdin.flush()
 
-            stdout, _ = p.communicate()
-            output_lines = stdout.strip().split("\n")
+            p.stdin.close()
+
+            output_lines = p.stdout.read().split("\n")
 
             i = 0
 

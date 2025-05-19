@@ -1,0 +1,337 @@
+[
+    {
+        "name": "Stage 1.1: Create a taxi",
+        "input": [
+            "r c -1 Tesla 1\n",
+            "r m 0\n",
+            "r ca 0\n",
+            "r gp 0\n",
+            "exit\n"
+        ],
+        "expected": [
+            "Tesla",
+            "1",
+            "[]"
+        ]
+    },
+    {
+        "name": "Stage 1.2: Add passengers and remove from taxi",
+        "input": [
+            "r c -1 Tesla 2\n",
+            "r b 0 Alice\n",
+            "r b 0 Bob\n",
+            "r gp 0\n",
+            "exit\n"
+        ],
+        "expected": [
+            "['Alice', 'Bob']"
+        ]
+    },
+    {
+        "name": "Stage 1.3: Set taxi destination, then set to idle",
+        "input": [
+            "r c -1 Tesla 1\n",
+            "r s 0 Sydney\n",
+            "r gd 0\n",
+            "r s 0 None\n",
+            "r gd 0\n",
+            "exit\n"
+        ],
+        "expected": [
+            "Sydney",
+            "None"
+        ]
+    },
+    {
+        "name": "Stage 1.4: Add too many passengers",
+        "input": [
+            "r c -1 Tesla 1\n",
+            "r b 0 Alice\n",
+            "r gp 0\n",
+            "r b 0 Bob\n",
+            "r gp 0\n",
+            "exit\n"
+        ],
+        "expected": [
+            "['Alice']",
+            "Bob cannot board the taxi, it is full.",
+            "['Alice']"
+        ]
+    },
+    {
+        "name": "Stage 1.5: Remove passenger that doesn't exist",
+        "input": [
+            "r c -1 Tesla 1\n",
+            "r a 0 Alice\n",
+            "exit\n"
+        ],
+        "expected": [
+            "Alice cannot alight the taxi, they are not a passenger."
+        ]
+    },
+    {
+        "name": "Stage 2.1: Create a taxi hub",
+        "input": [
+            "t c -1 Sydney 2\n",
+            "t ac 0\n",
+            "t wt 0\n",
+            "t md 0\n",
+            "exit\n"
+        ],
+        "expected": [
+            "0",
+            "0",
+            "No models"
+        ]
+    },
+    {
+        "name": "Stage 2.2: Add and remove taxis to the hub",
+        "input": [
+            "t c -1 Sydney 3\n",
+            "t l 0\n",
+            "t s 0\n",
+            "r c -1 Tesla 1\n",
+            "r c -1 BYD 2\n",
+            "r c -1 Tesla 1\n",
+            "t a 0 1\n",
+            "t a 0 2\n",
+            "t a 0 3\n",
+            "t ac 0\n",
+            "t md 0\n",
+            "t r 0 3\n",
+            "t ac 0\n",
+            "t md 0\n",
+            "exit\n"
+        ],
+        "expected": [
+            "Sydney",
+            "3",
+            "1.33",
+            "Tesla: 2 | BYD: 1",
+            "1.5",
+            "BYD: 1 | Tesla: 1"
+        ]
+    },
+    {
+        "name": "Stage 2.3: Resetting taxis in the hub",
+        "input": [
+            "t c -1 Sydney 2\n",
+            "r c -1 Tesla 1\n",
+            "r c -1 BYD 2\n",
+            "r b 1 Alice\n",
+            "r b 2 Bob\n",
+            "r b 2 Charlie\n",
+            "r s 1 Canberra\n",
+            "r s 2 Melbourne\n",
+            "r gp 1\n",
+            "r gp 2\n",
+            "r gd 1\n",
+            "r gd 2\n",
+            "t a 0 1\n",
+            "t a 0 2\n",
+            "t rs 0\n",
+            "r gp 1\n",
+            "r gp 2\n",
+            "r gd 1\n",
+            "r gd 2\n",
+            "exit\n"
+        ],
+        "expected": [
+            "['Alice']",
+            "['Bob', 'Charlie']",
+            "Canberra",
+            "Melbourne",
+            "[]",
+            "[]",
+            "None",
+            "None"
+        ]
+    },
+    {
+        "name": "Stage 2.4: Waiting taxis in the hub",
+        "input": [
+            "t c -1 Sydney 3\n",
+            "r c -1 Tesla 1\n",
+            "r c -1 BYD 2\n",
+            "r c -1 Tesla 1\n",
+            "r s 2 Melbourne\n",
+            "r b 3 Alice\n",
+            "t a 0 1\n",
+            "t a 0 2\n",
+            "t a 0 3\n",
+            "t wt 0\n",
+            "t rs 0\n",
+            "t wt 0\n",
+            "exit\n"
+        ],
+        "expected": [
+            "1",
+            "3"
+        ]
+    },
+    {
+        "name": "Stage 2.5: Adding too many taxis to the hub",
+        "input": [
+            "t c -1 Sydney 1\n",
+            "r c -1 Tesla 1\n",
+            "r c -1 BYD 2\n",
+            "t a 0 1\n",
+            "t a 0 2\n",
+            "exit\n"
+        ],
+        "expected": [
+            "Cannot add new taxi to this hub, the hub is full."
+        ]
+    },
+    {
+        "name": "Stage 2.6: Removing external taxis from the hub",
+        "input": [
+            "t c -1 Sydney 1\n",
+            "r c -1 Tesla 1\n",
+            "t r 0 1\n",
+            "exit\n"
+        ],
+        "expected": [
+            "Cannot remove the taxi from this hub, it is not based here."
+        ]
+    },
+    {
+        "name": "Stage 3.1: Create a passenger",
+        "input": [
+            "p c -1 Alice Free\n",
+            "p gfd 0\n",
+            "p s 0\n",
+            "exit\n"
+        ],
+        "expected": [
+            "None",
+            "Free"
+        ]
+    },
+    {
+        "name": "Stage 3.2: Upgrade subscription",
+        "input": [
+            "p c -1 Alice Free\n",
+            "p s 0\n",
+            "p u 0\n",
+            "p s 0\n",
+            "p u 0\n",
+            "p s 0\n",
+            "p u 0\n",
+            "p s 0\n",
+            "exit\n"
+        ],
+        "expected": [
+            "Free",
+            "Basic",
+            "Premium",
+            "Alice already has the maximum subscription.",
+            "Premium"
+        ]
+    },
+    {
+        "name": "Stage 3.3: Set passenger favourite destination",
+        "input": [
+            "p c -1 Alice Free\n",
+            "p gfd 0\n",
+            "p sfd 0 Melbourne\n",
+            "p gfd 0\n",
+            "exit\n"
+        ],
+        "expected": [
+            "None",
+            "Melbourne"
+        ]
+    },
+    {
+        "name": "Stage 3.4: Add passenger to taxi",
+        "input": [
+            "p c -1 Alice Free\n",
+            "r c -1 Tesla 1\n",
+            "r b 1 0\n",
+            "r gp 1\n",
+            "exit\n"
+        ],
+        "expected": [
+            "['Alice']"
+        ]
+    },
+    {
+        "name": "Stage 3.5: Remove passenger from taxi",
+        "input": [
+            "p c -1 Alice Free\n",
+            "r c -1 Tesla 1\n",
+            "r b 1 0\n",
+            "r gp 1\n",
+            "r a 1 0\n",
+            "r gp 1\n",
+            "exit\n"
+        ],
+        "expected": [
+            "['Alice']",
+            "[]"
+        ]
+    },
+    {
+        "name": "Stage 3.6: Fail to add and remove passenger from taxi",
+        "input": [
+            "p c -1 Alice Free\n",
+            "p c -1 Bob Free\n",
+            "r c -1 Tesla 1\n",
+            "r b 2 0\n",
+            "r b 2 1\n",
+            "r a 2 1\n",
+            "exit\n"
+        ],
+        "expected": [
+            "Bob cannot board the taxi, it is full.",
+            "Bob cannot alight the taxi, they are not a passenger."
+        ]
+    },
+    {
+        "name": "Stage 3.7: Get passenger favourite destinations from the hub",
+        "input": [
+            "p c -1 Alice Free\n",
+            "p c -1 Bob Free\n",
+            "p sfd 0 Melbourne\n",
+            "p sfd 1 Sydney\n",
+            "t c -1 Sydney 1\n",
+            "r c -1 BYD 3\n",
+            "r b 3 0\n",
+            "r b 3 1\n",
+            "t a 2 3\n",
+            "t fd 2\n",
+            "p c -1 Charlie Free\n",
+            "p sfd 4 Sydney\n",
+            "r b 3 4\n",
+            "t fd 2\n",
+            "exit\n"
+        ],
+        "expected": [
+            "Melbourne: 1 | Sydney: 1",
+            "Sydney: 2 | Melbourne: 1"
+        ]
+    },
+    {
+        "name": "Stage 3.8: Get passenger subscriptions from the hub",
+        "input": [
+            "p c -1 Alice Free\n",
+            "p c -1 Bob Free\n",
+            "t c -1 Sydney 1\n",
+            "r c -1 BYD 3\n",
+            "r b 3 0\n",
+            "r b 3 1\n",
+            "t a 2 3\n",
+            "t sd 2\n",
+            "p c -1 Charlie Premium\n",
+            "r b 3 4\n",
+            "p u 0\n",
+            "t sd 2\n",
+            "exit\n"
+        ],
+        "expected": [
+            "Premium: 0 | Basic: 0 | Free: 2",
+            "Premium: 1 | Basic: 1 | Free: 1"
+        ]
+    }
+]
